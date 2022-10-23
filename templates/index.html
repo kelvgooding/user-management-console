@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="author" content="Kelv Gooding">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="../static/css/style.css">
+        <link rel="icon" type="image/x-icon" href="../static/images/umc_logo.ico">
+        <title>Home | UMC</title>
+    </head>
+    <body>
+        <header>
+
+        <img width="50" height="50" src="../static/images/umc_logo.png" alt="logo" class="image-spacing" /><br>            
+
+        <div class="page-spacing"></div>
+        
+        <a href="{{ url_for('login') }}">
+            <button class="index-button">
+                Login
+            </button>
+        </a>
+
+        <br>
+
+        <a href="{{ url_for('create_user') }}">
+            <button class="index-button">
+                Create Account
+            </button>
+        </a>
+
+        <br>
+
+        <div class="page-spacing"></div>
+
+        <hr style="width:30%">
+        <br>
+        <a href="https://instagram.com/KelvGooding" target="_blank">Instagram</a> | <a href="https://github.com/KGoodz93" target="_blank">Github</a>
+        <br>
+        <br>
+        Created by Kelv Gooding
+        <br>
+        © 2022 All rights reserved.
+        </header>
+        <main>
+        </main>
+        <footer>
+        </footer>
+    </body>
+</html>
