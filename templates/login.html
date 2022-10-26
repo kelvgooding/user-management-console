@@ -12,7 +12,7 @@
 
         <img width="50" height="50" src="../static/images/umc_logo.png" alt="logo" class="image-spacing" /><br>            
 
-        <div class="login-page-spacing"></div>
+        <h1>Login</h1>
 
         <form method="post">
             <h3>Username:</h3>
@@ -35,13 +35,11 @@
             </button>
         </a>
 
-        <div class="login-page-spacing"></div>
-
         <br>
-        <h5>Don't have an account? Click <a href="{{ url_for('create_user') }}">Here</a><br>Click <a href="{{ url_for('password_reset') }}">Here</a> to reset your password.</h5>
+        <br>
+        <p>Don't have an account? Click <a href="{{ url_for('create_user') }}">Here</a><br>Unable to log in? Reset your password <a href="{{ url_for('login_pw_reset') }}">Here</a></p>
 
-
-        <hr style="width:30%">
+        <hr style="width:15%">
         <br>
         <a href="https://instagram.com/KelvGooding" target="_blank">Instagram</a> | <a href="https://github.com/KGoodz93" target="_blank">Github</a>
         <br>

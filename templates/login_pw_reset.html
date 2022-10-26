@@ -5,35 +5,29 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="../static/css/style.css">
         <link rel="icon" type="image/x-icon" href="../static/images/umc_logo.ico">
-        <title>View Users | UMC</title>
+        <title>Password Reset | UMC</title>
     </head>
     <body>
         <header>
 
         <img width="50" height="50" src="../static/images/umc_logo.png" alt="logo" class="image-spacing" />
-        <h1>View<br>Users</h1>
-        <br>
-        
-        <table class="table">
-            <tr class="table__header">
-                {% for header in headings %}
-                <th class="table__cell">{{ header }} </th>
-                {% endfor %}
-            </tr>
-            {% for row in data %}
-            <tr class="table__row">
-                {% for cell in row %}
-                <td class="table__cell">{{ cell }}</td>
-                {% endfor %}
-            </tr>
-            {% endfor %}
-        </table>
 
-        <br>
-        <br>
+        <h1>Password<br>Reset</h1>
+
+        <form method="post">
+            <h3>Enter Username:</h3>
+            <input type="text" name="pwreset-username" class="login-input" required/>
+            <br>
+            <br>
+            {% for i in get_flashed_messages() %}
+                <h3>{{ i }}</h3>
+            {% endfor %}
+            <br>
+            <input type="submit" value="Reset Password" class="delete-users-button"/><br>      
+        </form>
         
-        <a href="{{ url_for('umc') }}">
-            <button class="view-users-button">
+        <a href="{{ url_for('index') }}">
+            <button class="delete-users-button">
                 Back
             </button>
         </a>
