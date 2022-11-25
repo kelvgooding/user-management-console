@@ -7,6 +7,7 @@ import random
 import string
 import smtplib
 from email.message import EmailMessage
+import os
 
 # SQLite3 DB Connection
 
@@ -24,13 +25,11 @@ server.login(sender, passwd)
 # Flask
 
 app = Flask(__name__)
-app.secret_key = "abcde"
-
+app.secret_key = os.urandom(26)
 
 @app.route("/")
 def index():
     return render_template("index.html")
-
 
 @app.route("/login", methods=["POST", "GET"])
 def login():
@@ -62,15 +61,15 @@ def login_pw_reset():
             c.execute(f"UPDATE users SET password=(?), lastpasschange=(CURRENT_TIMESTAMP) WHERE loginid=(?)", (f'{"".join(random.choices(string.ascii_lowercase + string.ascii_uppercase, k=20))}', request.form.get("pwreset-username"),))
             connection.commit()
 
+            c.execute("SELECT password FROM users where loginid=(?);", (f'{request.form.get("pwreset-username")[0:5].lower().strip()}{request.form.get("pwreset-username")[0:3].lower().strip()}',))
+            passwd = c.fetchone()
 
-
-            passwd = c.execute("SELECT password FROM users where loginid=(?);", (f'{request.form.get("pwreset-username")[0:5].lower().strip()}{request.form.get("pwreset-username")[0:3].lower().strip()}',))
 
             msg2 = EmailMessage()
-            msg2["Subject"] = 'UMC Password Reset'
+            msg2["Subject"] = f"{request.form.get('pwreset-username')} - UMC Password Reset"
             msg2["From"] = sender
             msg2["To"] = "kelv.gooding@outlook.com"
-            msg2.set_content("Hi,\n\n"
+            msg2.set_content(f"Hi {request.form.get('pwreset-username')}\n\n"
                              f"Your password is: {passwd}\n\n")
             server.send_message(msg2)
 
@@ -262,4 +261,5 @@ def password_reset():
     return render_template("password_reset.html", list1=list1)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True)
+    app.debug = True
+    app.run(host='0.0.0.0', port=5000)
