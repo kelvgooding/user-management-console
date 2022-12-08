@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="../static/css/style.css">
         <link rel="icon" type="image/x-icon" href="../static/images/umc_icon.ico">
-        <title>Add User | UMC</title>
+        <title>Delete User | UMC</title>
     </head>
     <body>
         <header>
@@ -13,29 +13,28 @@
         <main>
 
         <img width="50" height="50" src="../static/images/umc_logo.png" alt="logo" class="image-spacing" />
-        
-        <h1>Add<br>Users</h1>
+
+        <h1>Delete<br>User</h1>
 
         <form method="post">
-            <h3>First Name:</h3>
-            <input type="text" name="au-firstname" class="login-input" required/>
-            <br>
-            <h3>Last Name:</h3>
-            <input type="text" name="au-lastname" class="login-input" required/>
-            <br>
-            <h3>Email:</h3>
-            <input type="text" name="au-email" class="login-input" required/>
+            <h3>Select Username:</h3>
+            <select name="delete-dropdownbox" id="dropdown" class="password-reset-dropdown">
+                <option value=""></option>
+                {% for i in list1 %}
+                    <option value="{{ i }}">{{ i }}</option>
+                {% endfor %}
+            </select>
             <br>
             <br>
             {% for i in get_flashed_messages()%}
                 <h3>{{ i }}</h3>
             {% endfor %}
             <br>
-            <input type="submit" value="Add User" class="add-user-button"/><br>      
+            <input type="submit" value="Delete User" class="password-reset-button"/><br>      
         </form>
         
         <a href="{{ url_for('umc') }}">
-            <button class="create-user-button">
+            <button class="add-user-button">
                 Back
             </button>
         </a>
