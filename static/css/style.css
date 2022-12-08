@@ -36,6 +36,17 @@ body {
     padding: 10px;
 }
 
+.footer-icons img {
+    margin-right: 5px;
+    margin-left: 5px;
+    width: 30px;
+    height: 30px;
+}
+
+hr {
+    width: 15%;
+}
+
 /* index.html  */
 
 .index-button {
