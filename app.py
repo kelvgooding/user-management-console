@@ -8,6 +8,9 @@ import string
 import smtplib
 from email.message import EmailMessage
 import os
+from flask import session
+from flask import url_for
+from flask import redirect
 
 # SQLite3 DB Connection
 
@@ -27,9 +30,11 @@ server.login(sender, passwd)
 app = Flask(__name__)
 app.secret_key = os.urandom(26)
 
+
 @app.route("/")
 def index():
     return render_template("index.html")
+
 
 @app.route("/login", methods=["POST", "GET"])
 def login():
@@ -41,15 +46,19 @@ def login():
         result = c.fetchone()
         if result != (f"{request.form.get('login-username')}", f"{request.form.get('login-password')}"):
             flash("Login failed. Please try again.")
-            return render_template("login.html")
+            if not session.get('name'):
+                print(session.get('name'))
+                return render_template("login.html")
         else:
-            return render_template("umc.html")
+            session["name"] = request.form.get('login-username')
+            print(session.get('name'))
+            return redirect(url_for("umc"))
     else:
         return render_template("login.html")
 
+
 @app.route("/login_pw_reset", methods=["POST", "GET"])
 def login_pw_reset():
-
     if request.method == "POST":
 
         list1 = []
@@ -58,12 +67,14 @@ def login_pw_reset():
             list1.append(i[-1])
 
         if request.form.get("pwreset-username") in list1:
-            c.execute(f"UPDATE users SET password=(?), lastpasschange=(CURRENT_TIMESTAMP) WHERE loginid=(?)", (f'{"".join(random.choices(string.ascii_lowercase + string.ascii_uppercase, k=20))}', request.form.get("pwreset-username"),))
+            c.execute(f"UPDATE users SET password=(?), lastpasschange=(CURRENT_TIMESTAMP) WHERE loginid=(?)", (
+            f'{"".join(random.choices(string.ascii_lowercase + string.ascii_uppercase, k=20))}',
+            request.form.get("pwreset-username"),))
             connection.commit()
 
-            c.execute("SELECT password FROM users where loginid=(?);", (f'{request.form.get("pwreset-username")[0:5].lower().strip()}{request.form.get("pwreset-username")[0:3].lower().strip()}',))
+            c.execute("SELECT password FROM users where loginid=(?);", (
+            f'{request.form.get("pwreset-username")[0:5].lower().strip()}{request.form.get("pwreset-username")[0:3].lower().strip()}',))
             passwd = c.fetchone()
-
 
             msg2 = EmailMessage()
             msg2["Subject"] = f"{request.form.get('pwreset-username')} - UMC Password Reset"
@@ -80,6 +91,7 @@ def login_pw_reset():
             return render_template("login_pw_reset.html")
     else:
         return render_template("login_pw_reset.html")
+
 
 @app.route("/create_user", methods=["POST", "GET"])
 def create_user():
@@ -115,7 +127,8 @@ def create_user():
                                  f'Your password will be send in a separate email.')
                 server.send_message(msg1)
 
-                c.execute("SELECT password FROM users where loginid=(?);", (f'{request.form.get("cu-lastname")[0:5].lower().strip()}{request.form.get("cu-firstname")[0:3].lower().strip()}',))
+                c.execute("SELECT password FROM users where loginid=(?);", (
+                f'{request.form.get("cu-lastname")[0:5].lower().strip()}{request.form.get("cu-firstname")[0:3].lower().strip()}',))
 
                 passwd = c.fetchone()[-1]
 
@@ -140,17 +153,25 @@ def create_user():
 
 @app.route("/umc", methods=["POST", "GET"])
 def umc():
-    return render_template("umc.html")
+    if session.get('name') is None:
+        return redirect("/")
+    return render_template("umc.html", session=session.get('name'))
+
+
+@app.route("/logout")
+def logout():
+    session['name'] = None
+    return redirect("/")
 
 
 @app.route("/view_users", methods=["POST", "GET"])
 def view_users():
-
     headings = ("Full Name", "UID", "Email", "Created Date")
 
     data = []
 
-    for i in c.execute("SELECT first_name || ' ' || last_name AS full_name, loginid, email, accountcreation FROM users ORDER BY loginid ASC"):
+    for i in c.execute(
+            "SELECT first_name || ' ' || last_name AS full_name, loginid, email, accountcreation FROM users ORDER BY loginid ASC"):
         data.append(i)
 
     return render_template("view_users.html", data=data, headings=headings)
@@ -163,7 +184,8 @@ def add_users():
 
     if request.method == "POST":
 
-        c.execute('SELECT loginid FROM users WHERE loginid=(?);', (f'{request.form.get("au-lastname")[0:5].lower().strip()}{request.form.get("au-firstname")[0:3].lower().strip()}',))
+        c.execute('SELECT loginid FROM users WHERE loginid=(?);', (
+        f'{request.form.get("au-lastname")[0:5].lower().strip()}{request.form.get("au-firstname")[0:3].lower().strip()}',))
 
         result = c.fetchone()
         try:
@@ -189,7 +211,8 @@ def add_users():
                                  f'Your password will be send in a separate email.')
                 server.send_message(msg1)
 
-                c.execute("SELECT password FROM users where loginid=(?);", (f'{request.form.get("au-lastname")[0:5].lower().strip()}{request.form.get("au-firstname")[0:3].lower().strip()}',))
+                c.execute("SELECT password FROM users where loginid=(?);", (
+                f'{request.form.get("au-lastname")[0:5].lower().strip()}{request.form.get("au-firstname")[0:3].lower().strip()}',))
 
                 passwd = c.fetchone()[-1]
 
@@ -209,9 +232,8 @@ def add_users():
     return render_template("add_users.html")
 
 
-@app.route("/delete_users", methods=["POST", "GET"])
-def delete_users():
-
+@app.route("/delete_user", methods=["POST", "GET"])
+def delete_user():
     username = request.form.get("delete-dropdownbox")
 
     list1 = []
@@ -230,12 +252,11 @@ def delete_users():
         else:
             flash("User does not exist. Please try again.")
 
-    return render_template("delete_users.html", list1=list1)
+    return render_template("delete_user.html", list1=list1)
 
 
 @app.route("/password_reset", methods=["POST", "GET"])
 def password_reset():
-
     username = request.form.get("dropdownbox")
     c_password = request.form.get("password-input")
     password1 = request.form.get("password-input1")
@@ -251,7 +272,8 @@ def password_reset():
         result = c.fetchone()[-1]
         if result == c_password:
             if password1 == password2:
-                c.execute(f"UPDATE users SET password=(?), lastpasschange=(CURRENT_TIMESTAMP) WHERE loginid=(?)", (password1, username,))
+                c.execute(f"UPDATE users SET password=(?), lastpasschange=(CURRENT_TIMESTAMP) WHERE loginid=(?)",
+                          (password1, username,))
                 connection.commit()
                 flash("Password has been changed!")
             else:
@@ -259,6 +281,7 @@ def password_reset():
         else:
             flash("Password is incorrect. Please try again")
     return render_template("password_reset.html", list1=list1)
+
 
 if __name__ == '__main__':
     app.debug = True
