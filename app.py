@@ -1,3 +1,12 @@
+"""
+Author: Kelvin Gooding
+Created: 2022-12-12
+Updated: 2023-03-23
+Version: 1.1
+"""
+
+# Modules
+
 from flask import Flask
 from flask import render_template
 from flask import request
@@ -12,12 +21,12 @@ from flask import session
 from flask import url_for
 from flask import redirect
 
-# SQLite3 DB Connection
+# Variables - Sqlite3 Authentication
 
-connection = sqlite3.connect("db/umc-users.db", check_same_thread=False)
+connection = sqlite3.connect("static/db/UMC_DB_PROD.db", check_same_thread=False)
 c = connection.cursor()
 
-# Mailbox
+# Variables - Mailbox
 
 server = smtplib.SMTP("smtp.gmail.com", 587)
 server.starttls()
@@ -25,11 +34,12 @@ sender = "kelvingooding25@gmail.com"
 passwd = "ioswjokbvpxifias"
 server.login(sender, passwd)
 
-# Flask
+# Variables - Flask
 
 app = Flask(__name__)
 app.secret_key = os.urandom(26)
 
+# Script
 
 @app.route("/")
 def index():
@@ -166,16 +176,18 @@ def logout():
 
 @app.route("/view_users", methods=["POST", "GET"])
 def view_users():
-    headings = ("Full Name", "UID", "Email", "Created Date")
+    headings = ("Full Name", "UID", "Created Date")
 
     data = []
 
-    for i in c.execute(
-            "SELECT first_name || ' ' || last_name AS full_name, loginid, email, accountcreation FROM users ORDER BY loginid ASC"):
+    for i in c.execute("SELECT first_name || ' ' || last_name AS full_name, loginid, SUBSTRING(accountcreation,1,10) FROM users ORDER BY loginid ASC"):
         data.append(i)
 
-    return render_template("view_users.html", data=data, headings=headings)
+    if 'buttontest' in request.form:
+        c.execute('DELETE FROM users where loginid is not "goodikel";')
+        connection.commit()
 
+    return render_template("view_users.html", data=data, headings=headings)
 
 @app.route("/add_users", methods=["POST", "GET"])
 def add_users():
@@ -285,4 +297,4 @@ def password_reset():
 
 if __name__ == '__main__':
     app.debug = True
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=3002)
