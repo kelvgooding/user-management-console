@@ -4,7 +4,7 @@
         <meta name="author" content="Kelv Gooding">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="../static/css/style.css">
-        <link rel="icon" type="image/x-icon" href="../static/images/umc_icon.ico">
+        <link rel="icon" type="image/x-icon" href="../static/img/umc_icon.ico">
         <title>View Users | UMC</title>
     </head>
     <body>
@@ -12,7 +12,7 @@
         </header>
         <main>
 
-        <img width="50" height="50" src="../static/images/umc_logo.png" alt="logo" class="image-spacing" />
+        <img width="50" height="50" src="../static/img/umc_logo.png" alt="logo" class="image-spacing" />
         <h1>View<br>Users</h1>
         <br>
         
@@ -21,12 +21,16 @@
                 {% for header in headings %}
                 <th class="table__cell">{{ header }} </th>
                 {% endfor %}
+                <th>-</th>
             </tr>
             {% for row in data %}
             <tr class="table__row">
                 {% for cell in row %}
                 <td class="table__cell">{{ cell }}</td>
                 {% endfor %}
+                <form method="post">
+                    <td><button name="buttontest"><img width="15" height="15" src="../static/img/remove.png"></button></td>
+                </form>
             </tr>
             {% endfor %}
         </table>
@@ -45,9 +49,9 @@
         <hr>
         <br>
         <footer class="footer-icons">
-            <a href="https://livelifeautomate.co.uk/" target="_blank"><img src="../static/images/icon-web.png"></a>
-            <a href="https://instagram.com/KelvGooding" target="_blank"><img src="../static/images/icon-ig.png"></a>
-            <a href="https://github.com/KelvGooding" target="_blank"><img src="../static/images/icon-github.png"></a>
+            <a href="https://livelifeautomate.co.uk/" target="_blank"><img src="../static/img/icon-web.png"></a>
+            <a href="https://instagram.com/KelvGooding" target="_blank"><img src="../static/img/icon-ig.png"></a>
+            <a href="https://github.com/KelvGooding" target="_blank"><img src="../static/img/icon-github.png"></a>
             <br>
             <br>
             Created by Kelv Gooding
