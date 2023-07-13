@@ -23,7 +23,7 @@ from flask import redirect
 
 # Variables - Sqlite3 Authentication
 
-connection = sqlite3.connect("static/db/UMC_DB_PROD.db", check_same_thread=False)
+connection = sqlite3.connect("UMC_DB_PROD.db", check_same_thread=False)
 c = connection.cursor()
 
 # Variables - Mailbox
