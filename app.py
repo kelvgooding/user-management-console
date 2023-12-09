@@ -1,40 +1,38 @@
+#!/bin/usr/python3
+
 """
 Author: Kelvin Gooding
 Created: 2022-12-12
-Updated: 2023-03-23
-Version: 1.1
+Updated: 2023-12-09
+Version: 1.2.0
 """
 
 # Modules
 
-from flask import Flask
-from flask import render_template
-from flask import request
-from flask import flash
+from flask import Flask, render_template, flash, request, session, url_for, redirect
+from modules import smtp_mail
+from modules import db_check
 import sqlite3
 import random
 import string
-import smtplib
-from email.message import EmailMessage
 import os
-from flask import session
-from flask import url_for
-from flask import redirect
+import getpass
 
-# Variables - Sqlite3 Authentication
+# General Variables
 
-connection = sqlite3.connect("user_management_console.db", check_same_thread=False)
-c = connection.cursor()
+# Default base path is root. Update the base path based on your environment.
 
-# Variables - Mailbox
+base_path = f'/home/{getpass.getuser()}/apps/user_management_console'
+db_filename = 'user_management_console.db'
+sql_script = f'{base_path}/scripts/sql/create_tables.sql'
 
-server = smtplib.SMTP("smtp.gmail.com", 587)
-server.starttls()
-sender = "kelvingooding25@gmail.com"
-passwd = "ioswjokbvpxifias"
-server.login(sender, passwd)
+# SQLite3 Variables
 
-# Variables - Flask
+db_check.check_db(f'{base_path}', f'{db_filename}', f'{sql_script}')
+conn = db_check.sqlite3.connect(os.path.join(base_path, db_filename), check_same_thread=False)
+c = conn.cursor()
+
+# Flask Variables
 
 app = Flask(__name__)
 app.secret_key = os.urandom(26)
@@ -44,7 +42,6 @@ app.secret_key = os.urandom(26)
 @app.route("/")
 def index():
     return render_template("index.html")
-
 
 @app.route("/login", methods=["POST", "GET"])
 def login():
@@ -66,7 +63,6 @@ def login():
     else:
         return render_template("login.html")
 
-
 @app.route("/login_pw_reset", methods=["POST", "GET"])
 def login_pw_reset():
     if request.method == "POST":
@@ -80,19 +76,14 @@ def login_pw_reset():
             c.execute(f"UPDATE users SET password=(?), lastpasschange=(CURRENT_TIMESTAMP) WHERE loginid=(?)", (
             f'{"".join(random.choices(string.ascii_lowercase + string.ascii_uppercase, k=20))}',
             request.form.get("pwreset-username"),))
-            connection.commit()
+            conn.commit()
 
             c.execute("SELECT password FROM users where loginid=(?);", (
             f'{request.form.get("pwreset-username")[0:5].lower().strip()}{request.form.get("pwreset-username")[0:3].lower().strip()}',))
             passwd = c.fetchone()
 
-            msg2 = EmailMessage()
-            msg2["Subject"] = f"{request.form.get('pwreset-username')} - UMC Password Reset"
-            msg2["From"] = sender
-            msg2["To"] = "kelv.gooding@outlook.com"
-            msg2.set_content(f"Hi {request.form.get('pwreset-username')}\n\n"
+            smtp_mail.send_email(f"", f"{request.form.get('pwreset-username')} - UMC Password Reset", f"Hi {request.form.get('pwreset-username')}\n\n"
                              f"Your password is: {passwd}\n\n")
-            server.send_message(msg2)
 
             flash("Password Reset email has been sent.")
             return render_template("login_pw_reset.html")
@@ -101,7 +92,6 @@ def login_pw_reset():
             return render_template("login_pw_reset.html")
     else:
         return render_template("login_pw_reset.html")
-
 
 @app.route("/create_user", methods=["POST", "GET"])
 def create_user():
@@ -126,29 +116,19 @@ def create_user():
                     f'{"".join(random.choices(string.ascii_lowercase + string.ascii_uppercase, k=20))}',
                     f'{request.form.get("cu-email").lower().strip()}'
                 ))
-                connection.commit()
+                conn.commit()
 
-                msg1 = EmailMessage()
-                msg1["Subject"] = f'{first_name} {last_name} - UMC Username'
-                msg1["From"] = sender
-                msg1["To"] = "kelv.gooding@outlook.com"
-                msg1.set_content('Hi,\n\n'
+                smtp_mail.send_email(f"{request.form.get('cu-email').lower().strip()}", f'{first_name} {last_name} - UMC Username', 'Hi,\n\n'
                                  f'Your username is: {request.form.get("cu-lastname")[0:5].lower().strip()}{request.form.get("cu-firstname")[0:3].lower().strip()}\n\n'
                                  f'Your password will be send in a separate email.')
-                server.send_message(msg1)
 
                 c.execute("SELECT password FROM users where loginid=(?);", (
                 f'{request.form.get("cu-lastname")[0:5].lower().strip()}{request.form.get("cu-firstname")[0:3].lower().strip()}',))
 
                 passwd = c.fetchone()[-1]
 
-                msg2 = EmailMessage()
-                msg2["Subject"] = f'{first_name} {last_name} - UMC Password'
-                msg2["From"] = sender
-                msg2["To"] = "kelv.gooding@outlook.com"
-                msg2.set_content("Hi,\n\n"
+                smtp_mail.send_email(f"{request.form.get('cu-email').lower().strip()}", f'{first_name} {last_name} - UMC Password', "Hi,\n\n"
                                  f"Your password is: {passwd}\n\n")
-                server.send_message(msg2)
 
                 flash('Your account has been created.')
                 return render_template("create_user.html")
@@ -160,19 +140,16 @@ def create_user():
     else:
         return render_template("create_user.html")
 
-
 @app.route("/umc", methods=["POST", "GET"])
 def umc():
     if session.get('name') is None:
         return redirect("/")
     return render_template("umc.html", session=session.get('name'))
 
-
 @app.route("/logout")
 def logout():
     session['name'] = None
     return redirect("/")
-
 
 @app.route("/view_users", methods=["POST", "GET"])
 def view_users():
@@ -185,7 +162,7 @@ def view_users():
 
     if 'buttontest' in request.form:
         c.execute('DELETE FROM users where loginid is not "goodikel";')
-        connection.commit()
+        conn.commit()
 
     return render_template("view_users.html", data=data, headings=headings)
 
@@ -212,29 +189,19 @@ def add_users():
                     f'{"".join(random.choices(string.ascii_lowercase + string.ascii_uppercase, k=20))}',
                     f'{request.form.get("au-email").lower().strip()}'
                 ))
-                connection.commit()
+                conn.commit()
 
-                msg1 = EmailMessage()
-                msg1["Subject"] = f'{first_name} {last_name} - UMC Username'
-                msg1["From"] = sender
-                msg1["To"] = "kelv.gooding@outlook.com"
-                msg1.set_content('Hi,\n\n'
+                smtp_mail.send_email('livelifeautomate@gmail.com', f'{first_name} {last_name} - UMC Username', 'Hi,\n\n'
                                  f'Your username is: {request.form.get("au-lastname")[0:5].lower().strip()}{request.form.get("au-firstname")[0:3].lower().strip()}\n\n'
                                  f'Your password will be send in a separate email.')
-                server.send_message(msg1)
 
                 c.execute("SELECT password FROM users where loginid=(?);", (
                 f'{request.form.get("au-lastname")[0:5].lower().strip()}{request.form.get("au-firstname")[0:3].lower().strip()}',))
 
                 passwd = c.fetchone()[-1]
 
-                msg2 = EmailMessage()
-                msg2["Subject"] = f'{first_name} {last_name} - UMC Password'
-                msg2["From"] = sender
-                msg2["To"] = "kelv.gooding@outlook.com"
-                msg2.set_content("Hi,\n\n"
-                                 f"Your password is: {passwd}\n\n")
-                server.send_message(msg2)
+                smtp_mail.send_email('livelifeautomate@gmail.com', f'{first_name} {last_name} - UMC Password', 'Hi,\n\n'
+                                 f'Your password is: {passwd}\n\n')
 
                 flash('A new account has been created!')
                 return render_template("add_users.html")
@@ -242,7 +209,6 @@ def add_users():
         except sqlite3.IntegrityError:
             flash('This username already exists.')
     return render_template("add_users.html")
-
 
 @app.route("/delete_user", methods=["POST", "GET"])
 def delete_user():
@@ -259,13 +225,12 @@ def delete_user():
 
         if result == username:
             c.execute(f"DELETE FROM users WHERE loginid=(?)", (username,))
-            connection.commit()
+            conn.commit()
             flash("User has been deleted!")
         else:
             flash("User does not exist. Please try again.")
 
     return render_template("delete_user.html", list1=list1)
-
 
 @app.route("/password_reset", methods=["POST", "GET"])
 def password_reset():
@@ -286,14 +251,13 @@ def password_reset():
             if password1 == password2:
                 c.execute(f"UPDATE users SET password=(?), lastpasschange=(CURRENT_TIMESTAMP) WHERE loginid=(?)",
                           (password1, username,))
-                connection.commit()
+                conn.commit()
                 flash("Password has been changed!")
             else:
                 flash("Password does not match. Please try again.")
         else:
             flash("Password is incorrect. Please try again")
     return render_template("password_reset.html", list1=list1)
-
 
 if __name__ == '__main__':
     app.debug = True
