@@ -22,7 +22,7 @@ import getpass
 
 # Default base path is root. Update the base path based on your environment.
 
-base_path = f'/home/{getpass.getuser()}/apps/user_management_console'
+base_path = f'/home/{getpass.getuser()}/apps/user-management-console'
 db_filename = 'user_management_console.db'
 sql_script = f'{base_path}/scripts/sql/create_tables.sql'
 
