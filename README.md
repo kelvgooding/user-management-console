@@ -18,6 +18,23 @@ Run the following command to install the requirements.txt file:
 pip3 install -r requirements.txt
 ```
 
+A .config.ini file needs to be created in the home directory. The values placed within this file are used within the /modules/auth.py file:
+
+```
+touch ~/.config.ini
+vi ~/.config.ini
+```
+
+Add the following contents into the files, whislt updating the values for each line:
+
+```
+[SMTP]
+SMTP_SERVER = 
+SMTP_PORT = 
+SMTP_EMAIL = 
+SMTP_PASSWORD = 
+```
+
 ## Dependencies
 
 ### Software:
