@@ -6,17 +6,47 @@ Repository: https://github.com/kelvgooding/user-management-console
 
 UMC (User Management Console) is a small web application designed to show the log in screen of an application, before gaining access to the main features. There is a feature to create an account if the user does not have login credentials.
 
-## System Requirements
+## OS Compatibility
 
 - Linux
 
-## Prerequisites
+## Dependencies
 
-Run the following command to install the requirements.txt file:
+### Linux Packages
+
+- python3
+- python3-pip
+
+### Python Modules
+
+- from flask import Flask, render_template, flash, request, session, url_for, redirect
+- from modules import smtp_mail
+- from modules import db_check
+- import sqlite3
+- import random
+- import string
+- import os
+- import getpass
+
+## Installation
+
+To download this web application, run the following commands on your linux environment:
+
+Downloading the repository from GitHub:
 
 ```
+cd ~
+git clone https://github.com/kelvgooding/user-management-console.git
+```
+
+Installating the requirements.txt file to ensure the correct packages are available and installed:
+
+```
+cd ~/user-management-console
 pip3 install -r requirements.txt
 ```
+
+The log file will contain the URL for the application, along with each request that is made.
 
 A .config.ini file needs to be created in the home directory. The values placed within this file are used within the /modules/auth.py file:
 
@@ -35,23 +65,12 @@ SMTP_EMAIL =
 SMTP_PASSWORD = 
 ```
 
-## Dependencies
+Running the application:
 
-### Software:
-
-- Python
-
-### Modules:
-
-- from flask import Flask, render_template, flash, request, session, url_for, redirect
-- from modules import smtp_mail
-- from modules import db_check
-- import sqlite3
-- import random
-- import string
-- import os
-- import getpass
-
+```
+cd ~/user-management-console
+python3 ~/user-management-console/app.py >> ~/app_user-management-console_`date +\%Y\%m\%d`.log 2>&1 &
+```
 ## Stakeholders
 
 PM: Kelvin Gooding | kelv.gooding@outlook.com<br>

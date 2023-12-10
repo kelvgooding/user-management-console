@@ -3,8 +3,8 @@
 """
 Author: Kelvin Gooding
 Created: 2022-12-12
-Updated: 2023-12-09
-Version: 1.2.0
+Updated: 2023-12-10
+Version: 1.2.1
 """
 
 # Modules
@@ -16,13 +16,12 @@ import sqlite3
 import random
 import string
 import os
-import getpass
 
 # General Variables
 
 # Default base path is root. Update the base path based on your environment.
 
-base_path = f'/home/{getpass.getuser()}/apps/user-management-console'
+base_path = os.path.dirname(os.path.abspath(__file__))
 db_filename = 'user_management_console.db'
 sql_script = f'{base_path}/scripts/sql/create_tables.sql'
 
