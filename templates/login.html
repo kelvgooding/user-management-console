@@ -16,6 +16,8 @@
 
         <h1>Login</h1>
 
+        <p>Don't have an account? Click <a href="{{ url_for('create_user') }}">Here</a><br>Unable to log in? Reset your password <a href="{{ url_for('login_pw_reset') }}">Here</a></p>
+
         <form method="post">
             <h3>Username:</h3>
             <input type="text" name="login-username" class="login-input" required/>
@@ -39,21 +41,8 @@
 
         <script src="../static/js/js-script.js"></script>
 
-        <br>
-        <br>
-        <p>Don't have an account? Click <a href="{{ url_for('create_user') }}">Here</a><br>Unable to log in? Reset your password <a href="{{ url_for('login_pw_reset') }}">Here</a></p>
-
-        <hr>
-        <br>
-        <footer class="footer-icons">
-            <a href="https://livelifeautomate.co.uk/" target="_blank"><img src="../static/img/icon-web.png"></a>
-            <a href="https://instagram.com/KelvGooding" target="_blank"><img src="../static/img/icon-ig.png"></a>
-            <a href="https://github.com/KelvGooding" target="_blank"><img src="../static/img/icon-github.png"></a>
-            <br>
-            <br>
-            Created by Kelv Gooding
-            <br>
-            © 2022 All rights reserved.
+        </main>
+        <footer>
         </footer>
     </body>
 </html>

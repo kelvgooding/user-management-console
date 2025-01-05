@@ -1,32 +1,25 @@
-#!/bin/usr/python3
-
 """
 Author: Kelvin Gooding
 Created: 2022-12-12
-Updated: 2023-12-10
-Version: 1.2.1
+Updated: 2025-01-05
+Version: 1.2
 """
 
 # Modules
 
 from flask import Flask, render_template, flash, request, session, url_for, redirect
-from modules import smtp_mail
 from modules import db_check
-import sqlite3
-import random
-import string
+from modules import smtp_mail
 import os
-
-# General Variables
-
-# Default base path is root. Update the base path based on your environment.
-
-base_path = os.path.dirname(os.path.abspath(__file__))
-db_filename = 'user_management_console.db'
-sql_script = f'{base_path}/scripts/sql/create_tables.sql'
+import random
+import sqlite3
+import string
 
 # SQLite3 Variables
 
+db_filename = 'user_management_console.db'
+base_path = os.path.dirname(os.path.abspath(__file__))
+sql_script = f'{base_path}/scripts/sql/create_tables.sql'
 db_check.check_db(f'{base_path}', f'{db_filename}', f'{sql_script}')
 conn = db_check.sqlite3.connect(os.path.join(base_path, db_filename), check_same_thread=False)
 c = conn.cursor()
@@ -130,6 +123,8 @@ def create_user():
                                  f"Your password is: {passwd}\n\n")
 
                 flash('Your account has been created.')
+                flash(f'An email has been sent to {request.form.get("cu-email").lower().strip()}')
+
                 return render_template("create_user.html")
 
         except sqlite3.IntegrityError:

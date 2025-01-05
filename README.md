@@ -2,84 +2,87 @@
 
 ## Description
 
-Repository: https://github.com/kelvgooding/user-management-console
+UMC (User Management Console) is a simple web application designed to show the log in process, before gaining access to the main features, such as create users, deleting, and resetting password for user accounts.
 
-UMC (User Management Console) is a small web application designed to show the log in screen of an application, before gaining access to the main features. There is a feature to create an account if the user does not have login credentials.
+## Running app locally
 
-## OS Compatibility
-
-- Linux
-
-## Dependencies
-
-### Linux Packages
-
-- python3
-- python3-pip
-
-### Python Modules
-
-- from flask import Flask, render_template, flash, request, session, url_for, redirect
-- from modules import smtp_mail
-- from modules import db_check
-- import sqlite3
-- import random
-- import string
-- import os
-- import getpass
-
-## Installation
-
-To download this web application, run the following commands on your linux environment:
-
-Downloading the repository from GitHub:
+Clone the repository:
 
 ```
 cd ~
 git clone https://github.com/kelvgooding/user-management-console.git
-```
-
-Installating the requirements.txt file to ensure the correct packages are available and installed:
-
-```
 cd ~/user-management-console
-pip3 install -r requirements.txt
 ```
 
-The log file will contain the URL for the application, along with each request that is made.
-
-A .config.ini file needs to be created in the home directory. The values placed within this file are used within the /modules/auth.py file:
+A ```config.ini``` file needs to be created. The values placed within this file are used in ```modules/auth.py```:
 
 ```
 touch ~/.config.ini
 vi ~/.config.ini
 ```
-
-Add the following contents into the files, whislt updating the values for each line:
+Add the below into ```.config.ini``` and update the values accordingly:
 
 ```
 [SMTP]
-SMTP_SERVER = 
-SMTP_PORT = 
-SMTP_EMAIL = 
-SMTP_PASSWORD = 
+SMTP_SERVER = smtp.gmail.com
+SMTP_PORT = 587
+SMTP_EMAIL = username@gmail.com
+SMTP_PASSWORD = password
 ```
 
-Running the application:
+Install any dependices required:
 
 ```
+pip install -r requirements.txt
+```
+
+The log file will contain the URL for the application, along with each request that is made.
+
+```
+python3 ~/user-management-console/app.py >> ~/user-management-console/user-management-console_`date +\%Y\%m\%d`.log 2>&1 &
+```
+```
+cat ~/user-management-console/user-management-console_`date +\%Y\%m\%d`.log 2>&1 &
+```
+
+This can now be accessed via web browser - http://localhost:3002
+
+## Running app using Docker
+
+Clone the repository:
+
+```
+cd ~
+git clone https://github.com/kelvgooding/user-management-console.git
 cd ~/user-management-console
-python3 ~/user-management-console/app.py >> ~/app_user-management-console_`date +\%Y\%m\%d`.log 2>&1 &
 ```
-## Stakeholders
 
-PM: Kelvin Gooding | kelv.gooding@outlook.com<br>
-Design: Kelvin Gooding | kelv.gooding@outlook.com<br>
-Dev: Kelvin Gooding | kelv.gooding@outlook.com<br>
-QA: Kelvin Gooding | kelv.gooding@outlook.com<br>
-Support: Kelvin Gooding | kelv.gooding@outlook.com
+A ```config.ini``` file needs to be created. The values placed within this file are used in ```modules/auth.py```:
 
-## Contribution
+```
+touch ~/.config.ini
+vi ~/.config.ini
+```
+Add the below into ```.config.ini``` and update the values accordingly:
 
-Issue Tracker: https://github.com/kelvgooding/user-management-console/issues<br>
-Contact: Kelvin Gooding | kelv.gooding@outlook.com
+```
+[SMTP]
+SMTP_SERVER = smtp.gmail.com
+SMTP_PORT = 587
+SMTP_EMAIL = username@gmail.com
+SMTP_PASSWORD = password
+```
+
+Run the following command to build the Docker image
+
+```
+sudo docker build -t user-management-console .
+```
+
+Run the following command to create and start the container:
+
+```
+sudo docker run -itd -p 3002:3002 user-management-console
+```
+
+This can now be accessed via web browser - http://localhost:3002
