@@ -1,8 +1,8 @@
 """
 Author: Kelvin Gooding
 Created: 2022-12-12
-Updated: 2025-01-05
-Version: 1.2
+Updated: 2025-03-07
+Version: 1.3
 """
 
 # Modules
@@ -15,13 +15,17 @@ import random
 import sqlite3
 import string
 
+# Variables
+
+base_path = os.path.dirname(os.path.abspath(__file__))
+app_name = os.path.basename(os.path.dirname(os.path.abspath(__file__)))
+db_filename = 'user_management_console.db'
+sql_script = os.path.join(base_path, 'scripts/sql/create_tables.sql')
+
 # SQLite3 Variables
 
-db_filename = 'user_management_console.db'
-base_path = os.path.dirname(os.path.abspath(__file__))
-sql_script = f'{base_path}/scripts/sql/create_tables.sql'
-db_check.check_db(f'{base_path}', f'{db_filename}', f'{sql_script}')
-conn = db_check.sqlite3.connect(os.path.join(base_path, db_filename), check_same_thread=False)
+db_check.check_db(f'/data', f'{db_filename}', f'{sql_script}')
+conn = db_check.sqlite3.connect(os.path.join('/data', db_filename), check_same_thread=False)
 c = conn.cursor()
 
 # Flask Variables
